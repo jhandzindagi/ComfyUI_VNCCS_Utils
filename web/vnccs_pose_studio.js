@@ -61,7 +61,8 @@ const STYLES = `
     color: var(--ps-text);
     overflow: hidden;
     box-sizing: border-box;
-    zoom: 0.67;
+    transform: scale(0.67);
+    transform-origin: 0 0;
     pointer-events: none;
     position: relative;
 }
@@ -4392,8 +4393,12 @@ class PoseStudioWidget {
                 this.viewer.updateLights(this.lightParams);
             }
         }
-        // Lightweight sync for prompt/data (no capture)
-        this.syncToNode(false);
+
+        // Lightweight sync for prompt/data (no capture) - Debounced to prevent UI lag during drag
+        clearTimeout(this.lightingQuickSyncTimeout);
+        this.lightingQuickSyncTimeout = setTimeout(() => {
+            this.syncToNode(false);
+        }, 100);
 
         // Debounce full capture (previews) to avoid lag/shaking during drag
         clearTimeout(this.lightingSyncTimeout);
